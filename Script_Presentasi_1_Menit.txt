@@ -1,0 +1,29 @@
+SCRIPT PRESENTASI ANIMASI 3D ROBLOX KICK
+==========================================
+Durasi: 1 Menit | Bahasa: Santai & Padat
+
+---
+
+Halo! Kami presentasikan "Roblox Kick Animation" - animasi 3D karakter Roblox menendang bola.
+
+[TUNJUKKAN ANIMASI ORBIT]
+Ini karakter Roblox yang kami buat pakai voxel 3D - ada kepala, badan, tangan, dan kaki.
+
+[TUNJUKKAN BOLA]
+Ini bolanya dengan 12 pentagon hitam dan hexagon putih, pakai konsep icosahedron dengan sudut lancip.
+
+[TUNJUKKAN ANIMASI INTRO]
+Skenario dimulai dengan kamera orbit 360 derajat sebagai intro cinematic.
+
+[TUNJUKKAN KAMERA DEPAN & BELAKANG]
+Lalu kamera pindah ke depan dan belakang, menangkap pose kick dari dua perspektif.
+
+[RENCANA LANJUTAN]
+Rencana selanjutnya: animasi tendangan lengkap dengan kamera zoom ke bola, bola bergerak mengecil ke gawang, plus background lapangan sepak bola.
+
+Semua dibuat pakai Python dengan transformasi 3D dan proyeksi perspektif.
+
+Terima kasih!
+
+---
+TIPS: Bicara santai, tunjukkan animasi saat disebutkan, total 50-60 detik.
