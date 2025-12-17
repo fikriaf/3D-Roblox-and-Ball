@@ -18,7 +18,7 @@ num_frames = 20  # Total frames for kick animation
 #============================================================================================
 print("Creating base character...")
 
-col, row, length = 200, 200, 200
+col, row, length = 800, 800, 800
 voxel = np.zeros(shape=(row, col, length, 3), dtype=np.uint8)
 
 # Character parameters
@@ -35,7 +35,7 @@ warna_hitam = [50, 50, 50]
 # Size parameters
 head_size = round(0.18 * row)
 leg_width = round(0.14 * row)
-leg_gap = 4
+leg_gap = max(2, round(4 * row / 200))  # Scale with resolution
 body_width = 2 * leg_width + leg_gap
 body_height = body_width
 body_depth = round(0.15 * row)
@@ -64,7 +64,7 @@ def create_character_with_pose(right_leg_angle, left_leg_angle, right_arm_angle,
     
     # HEAD (rounded box)
     head_half = round(head_size / 2)
-    corner_radius = 4
+    corner_radius = max(2, round(4 * row / 200))  # Scale with resolution
     for i in range(head_top, head_bottom):
         for j in range(xc - head_half, xc + head_half):
             for k in range(zc - head_half, zc + head_half):
@@ -76,7 +76,7 @@ def create_character_with_pose(right_leg_angle, left_leg_angle, right_arm_angle,
                     voxel_pose[i, j, k, :] = warna_kulit[:]
     
     # BODY (rounded box)
-    body_corner_radius = 2
+    body_corner_radius = max(1, round(2 * row / 200))  # Scale with resolution
     body_half_width = round(body_width / 2)
     body_half_height = round(body_height / 2)
     body_half_depth = round(body_depth / 2)
@@ -196,15 +196,19 @@ def create_character_with_pose(right_leg_angle, left_leg_angle, right_arm_angle,
                     else:
                         voxel_pose[y_pos, x_pos, z_pos, :] = warna_kulit[:]
     
+    # Scale factor for text/face (relative to 200 resolution)
+    scale = row / 200
+    text_depth = max(2, round(row / 100))
+    
     # ADD FACE (eyes and smile) on FRONT of head
     face_z_start = zc - head_half
-    face_z_end = face_z_start + 3
+    face_z_end = face_z_start + text_depth
     
-    # Eyes
-    eye_width = 4
-    eye_height = 8
+    # Eyes - SCALED (bigger eyes)
+    eye_width = max(3, round(6 * scale))
+    eye_height = max(5, round(10 * scale))
     eye_spacing = round(head_size * 0.20)
-    eye_y_start = head_top + round(head_size * 0.30)
+    eye_y_start = head_top + round(head_size * 0.28)
     eye_y_end = eye_y_start + eye_height
     
     # Left eye
@@ -217,15 +221,16 @@ def create_character_with_pose(right_leg_angle, left_leg_angle, right_arm_angle,
     right_eye_x_end = xc + eye_spacing + eye_width//2
     voxel_pose[eye_y_start:eye_y_end, right_eye_x_start:right_eye_x_end, face_z_start:face_z_end, :] = warna_hitam[:]
     
-    # Smile
+    # Smile - SCALED (shorter width)
     smile_y_start = head_top + round(head_size * 0.65)
-    smile_width = round(head_size * 0.40)
-    smile_thickness = 3
+    smile_width = round(head_size * 0.25)  # Reduced from 0.40 to 0.25
+    smile_thickness = max(2, round(3 * scale))
+    smile_curve = max(2, round(4 * scale))
     
     for j in range(xc - smile_width, xc + smile_width + 1):
         x_norm = (j - xc) / smile_width
         if abs(x_norm) <= 1:
-            y_offset = int(5 * (1 - x_norm**2))
+            y_offset = int(smile_curve * (1 - x_norm**2))
             smile_y = smile_y_start + y_offset
             if smile_y < head_bottom - 2:
                 voxel_pose[smile_y:smile_y+smile_thickness, j, face_z_start:face_z_end, :] = warna_hitam[:]
@@ -234,58 +239,68 @@ def create_character_with_pose(right_leg_angle, left_leg_angle, right_arm_angle,
     body_half_depth = round(body_depth / 2)
     back_z = zc + body_half_depth - 2
     
-    # "TEAM" text
+    # "TEAM" text - SCALED
     team_y_start = body_top + round(body_height * 0.10)
-    team_total_width = 21
+    letter_height = round(7 * scale)
+    letter_stroke = max(1, round(1 * scale))
+    team_total_width = round(21 * scale)
     team_x_start = xc - round(team_total_width / 2)
     
     # Letter T
-    voxel_pose[team_y_start:team_y_start+1, team_x_start:team_x_start+5, back_z:back_z+2, :] = warna_hitam[:]
-    voxel_pose[team_y_start:team_y_start+7, team_x_start+2:team_x_start+3, back_z:back_z+2, :] = warna_hitam[:]
+    t_width = round(5 * scale)
+    voxel_pose[team_y_start:team_y_start+letter_stroke, team_x_start:team_x_start+t_width, back_z:back_z+text_depth, :] = warna_hitam[:]
+    voxel_pose[team_y_start:team_y_start+letter_height, team_x_start+round(2*scale):team_x_start+round(3*scale), back_z:back_z+text_depth, :] = warna_hitam[:]
     
     # Letter E
-    voxel_pose[team_y_start:team_y_start+7, team_x_start+6:team_x_start+7, back_z:back_z+2, :] = warna_hitam[:]
-    voxel_pose[team_y_start:team_y_start+1, team_x_start+6:team_x_start+10, back_z:back_z+2, :] = warna_hitam[:]
-    voxel_pose[team_y_start+3:team_y_start+4, team_x_start+6:team_x_start+9, back_z:back_z+2, :] = warna_hitam[:]
-    voxel_pose[team_y_start+6:team_y_start+7, team_x_start+6:team_x_start+10, back_z:back_z+2, :] = warna_hitam[:]
+    e_start = team_x_start + round(6 * scale)
+    e_width = round(4 * scale)
+    voxel_pose[team_y_start:team_y_start+letter_height, e_start:e_start+letter_stroke, back_z:back_z+text_depth, :] = warna_hitam[:]
+    voxel_pose[team_y_start:team_y_start+letter_stroke, e_start:e_start+e_width, back_z:back_z+text_depth, :] = warna_hitam[:]
+    voxel_pose[team_y_start+round(3*scale):team_y_start+round(4*scale), e_start:e_start+round(3*scale), back_z:back_z+text_depth, :] = warna_hitam[:]
+    voxel_pose[team_y_start+letter_height-letter_stroke:team_y_start+letter_height, e_start:e_start+e_width, back_z:back_z+text_depth, :] = warna_hitam[:]
     
     # Letter A
-    voxel_pose[team_y_start+1:team_y_start+7, team_x_start+11:team_x_start+12, back_z:back_z+2, :] = warna_hitam[:]
-    voxel_pose[team_y_start+1:team_y_start+7, team_x_start+14:team_x_start+15, back_z:back_z+2, :] = warna_hitam[:]
-    voxel_pose[team_y_start:team_y_start+1, team_x_start+12:team_x_start+14, back_z:back_z+2, :] = warna_hitam[:]
-    voxel_pose[team_y_start+3:team_y_start+4, team_x_start+11:team_x_start+15, back_z:back_z+2, :] = warna_hitam[:]
+    a_start = team_x_start + round(11 * scale)
+    a_width = round(4 * scale)
+    voxel_pose[team_y_start+letter_stroke:team_y_start+letter_height, a_start:a_start+letter_stroke, back_z:back_z+text_depth, :] = warna_hitam[:]
+    voxel_pose[team_y_start+letter_stroke:team_y_start+letter_height, a_start+a_width-letter_stroke:a_start+a_width, back_z:back_z+text_depth, :] = warna_hitam[:]
+    voxel_pose[team_y_start:team_y_start+letter_stroke, a_start+letter_stroke:a_start+a_width-letter_stroke, back_z:back_z+text_depth, :] = warna_hitam[:]
+    voxel_pose[team_y_start+round(3*scale):team_y_start+round(4*scale), a_start:a_start+a_width, back_z:back_z+text_depth, :] = warna_hitam[:]
     
     # Letter M
-    voxel_pose[team_y_start:team_y_start+7, team_x_start+16:team_x_start+17, back_z:back_z+2, :] = warna_hitam[:]
-    voxel_pose[team_y_start:team_y_start+7, team_x_start+20:team_x_start+21, back_z:back_z+2, :] = warna_hitam[:]
-    voxel_pose[team_y_start+1:team_y_start+4, team_x_start+18:team_x_start+19, back_z:back_z+2, :] = warna_hitam[:]
+    m_start = team_x_start + round(16 * scale)
+    m_width = round(5 * scale)
+    voxel_pose[team_y_start:team_y_start+letter_height, m_start:m_start+letter_stroke, back_z:back_z+text_depth, :] = warna_hitam[:]
+    voxel_pose[team_y_start:team_y_start+letter_height, m_start+m_width-letter_stroke:m_start+m_width, back_z:back_z+text_depth, :] = warna_hitam[:]
+    voxel_pose[team_y_start+letter_stroke:team_y_start+round(4*scale), m_start+round(2*scale):m_start+round(3*scale), back_z:back_z+text_depth, :] = warna_hitam[:]
     
-    # Big "2" at center back
-    num_height = 16
+    # Big "2" at center back - SCALED
+    num_height = round(16 * scale)
+    num_width = round(14 * scale)
     num_y_start = body_top + round(body_height / 2) - round(num_height / 2)
-    num_width = 14
     num_x_start = xc - round(num_width / 2)
-    stroke_width = 3
+    stroke_width = max(2, round(3 * scale))
     
-    voxel_pose[num_y_start:num_y_start+stroke_width, num_x_start:num_x_start+num_width, back_z:back_z+2, :] = warna_hitam[:]
-    voxel_pose[num_y_start:num_y_start+7, num_x_start+num_width-stroke_width:num_x_start+num_width, back_z:back_z+2, :] = warna_hitam[:]
-    voxel_pose[num_y_start+6:num_y_start+9, num_x_start:num_x_start+num_width, back_z:back_z+2, :] = warna_hitam[:]
-    voxel_pose[num_y_start+8:num_y_start+num_height, num_x_start:num_x_start+stroke_width, back_z:back_z+2, :] = warna_hitam[:]
-    voxel_pose[num_y_start+num_height-stroke_width:num_y_start+num_height, num_x_start:num_x_start+num_width, back_z:back_z+2, :] = warna_hitam[:]
+    voxel_pose[num_y_start:num_y_start+stroke_width, num_x_start:num_x_start+num_width, back_z:back_z+text_depth, :] = warna_hitam[:]
+    voxel_pose[num_y_start:num_y_start+round(7*scale), num_x_start+num_width-stroke_width:num_x_start+num_width, back_z:back_z+text_depth, :] = warna_hitam[:]
+    voxel_pose[num_y_start+round(6*scale):num_y_start+round(9*scale), num_x_start:num_x_start+num_width, back_z:back_z+text_depth, :] = warna_hitam[:]
+    voxel_pose[num_y_start+round(8*scale):num_y_start+num_height, num_x_start:num_x_start+stroke_width, back_z:back_z+text_depth, :] = warna_hitam[:]
+    voxel_pose[num_y_start+num_height-stroke_width:num_y_start+num_height, num_x_start:num_x_start+num_width, back_z:back_z+text_depth, :] = warna_hitam[:]
     
-    # Small "2" on FRONT right
+    # Small "2" on FRONT right - SCALED
     front_z = zc - body_half_depth
-    small_num_height = 7
-    small_num_width = 5
+    small_num_height = round(7 * scale)
+    small_num_width = round(5 * scale)
     small_num_y_start = body_top + round(body_height * 0.15)
-    small_num_x_start = xc + round(body_width/2) - small_num_width - 8
-    stroke = 1
+    small_num_x_start = xc + round(body_width/2) - small_num_width - round(8 * scale)
+    stroke = max(1, round(1 * scale))
+    small_mid = round(3 * scale)
     
-    voxel_pose[small_num_y_start:small_num_y_start+stroke, small_num_x_start:small_num_x_start+small_num_width, front_z:front_z+2, :] = warna_hitam[:]
-    voxel_pose[small_num_y_start:small_num_y_start+3, small_num_x_start+small_num_width-stroke:small_num_x_start+small_num_width, front_z:front_z+2, :] = warna_hitam[:]
-    voxel_pose[small_num_y_start+3:small_num_y_start+4, small_num_x_start:small_num_x_start+small_num_width, front_z:front_z+2, :] = warna_hitam[:]
-    voxel_pose[small_num_y_start+3:small_num_y_start+small_num_height, small_num_x_start:small_num_x_start+stroke, front_z:front_z+2, :] = warna_hitam[:]
-    voxel_pose[small_num_y_start+small_num_height-stroke:small_num_y_start+small_num_height, small_num_x_start:small_num_x_start+small_num_width, front_z:front_z+2, :] = warna_hitam[:]
+    voxel_pose[small_num_y_start:small_num_y_start+stroke, small_num_x_start:small_num_x_start+small_num_width, front_z:front_z+text_depth, :] = warna_hitam[:]
+    voxel_pose[small_num_y_start:small_num_y_start+small_mid, small_num_x_start+small_num_width-stroke:small_num_x_start+small_num_width, front_z:front_z+text_depth, :] = warna_hitam[:]
+    voxel_pose[small_num_y_start+small_mid:small_num_y_start+small_mid+stroke, small_num_x_start:small_num_x_start+small_num_width, front_z:front_z+text_depth, :] = warna_hitam[:]
+    voxel_pose[small_num_y_start+small_mid:small_num_y_start+small_num_height, small_num_x_start:small_num_x_start+stroke, front_z:front_z+text_depth, :] = warna_hitam[:]
+    voxel_pose[small_num_y_start+small_num_height-stroke:small_num_y_start+small_num_height, small_num_x_start:small_num_x_start+small_num_width, front_z:front_z+text_depth, :] = warna_hitam[:]
     
     return voxel_pose
 

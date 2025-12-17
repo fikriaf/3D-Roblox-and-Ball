@@ -21,7 +21,7 @@ no_of_rotation = int(15)
 print ("Creating a 3D Roblox character...."); print ("")
 
 # THE USER DECIDES THE SIZE OF THE 3D ROOM AND THE 2D SCREEN (MAX 1080 BY 1080)
-col, row, length = 200, 200, 200      #Ensure making a cubic 3D space and a square 2D screen.
+col, row, length = 800, 800, 800      #Ensure making a cubic 3D space and a square 2D screen.
 
 #Creating The Template Matrix for the 3D Model
 voxel  = np.zeros(shape=(row, col, length, 3), dtype=np.uint8)    #Template for the 3D model
@@ -210,70 +210,85 @@ for i in range(right_leg_top, right_leg_bottom):
 
 # Add text "Team 2" on back of body
 back_z = body_back - 2  # Position on back of body
+text_depth = max(2, round(row / 100))  # Text depth scales with resolution
+
+# Scale factor for text (relative to 200 resolution)
+scale = row / 200
 
 # Simple pixel art for "TEAM" - centered horizontally
-team_y_start = body_top + round(body_height * 0.10)  # Lebih ke atas
-team_total_width = 21  # Total width of TEAM text
+team_y_start = body_top + round(body_height * 0.10)
+letter_height = round(7 * scale)
+letter_stroke = max(1, round(1 * scale))
+team_total_width = round(21 * scale)
 team_x_start = xc - round(team_total_width / 2)
 
 # Letter T
-voxel[team_y_start:team_y_start+1, team_x_start:team_x_start+5, back_z:back_z+2, :] = warna_hitam[:]  # Top bar
-voxel[team_y_start:team_y_start+7, team_x_start+2:team_x_start+3, back_z:back_z+2, :] = warna_hitam[:]  # Vertical
+t_width = round(5 * scale)
+voxel[team_y_start:team_y_start+letter_stroke, team_x_start:team_x_start+t_width, back_z:back_z+text_depth, :] = warna_hitam[:]
+voxel[team_y_start:team_y_start+letter_height, team_x_start+round(2*scale):team_x_start+round(3*scale), back_z:back_z+text_depth, :] = warna_hitam[:]
 
 # Letter E
-voxel[team_y_start:team_y_start+7, team_x_start+6:team_x_start+7, back_z:back_z+2, :] = warna_hitam[:]  # Vertical
-voxel[team_y_start:team_y_start+1, team_x_start+6:team_x_start+10, back_z:back_z+2, :] = warna_hitam[:]  # Top
-voxel[team_y_start+3:team_y_start+4, team_x_start+6:team_x_start+9, back_z:back_z+2, :] = warna_hitam[:]  # Middle
-voxel[team_y_start+6:team_y_start+7, team_x_start+6:team_x_start+10, back_z:back_z+2, :] = warna_hitam[:]  # Bottom
+e_start = team_x_start + round(6 * scale)
+e_width = round(4 * scale)
+voxel[team_y_start:team_y_start+letter_height, e_start:e_start+letter_stroke, back_z:back_z+text_depth, :] = warna_hitam[:]
+voxel[team_y_start:team_y_start+letter_stroke, e_start:e_start+e_width, back_z:back_z+text_depth, :] = warna_hitam[:]
+voxel[team_y_start+round(3*scale):team_y_start+round(4*scale), e_start:e_start+round(3*scale), back_z:back_z+text_depth, :] = warna_hitam[:]
+voxel[team_y_start+letter_height-letter_stroke:team_y_start+letter_height, e_start:e_start+e_width, back_z:back_z+text_depth, :] = warna_hitam[:]
 
 # Letter A
-voxel[team_y_start+1:team_y_start+7, team_x_start+11:team_x_start+12, back_z:back_z+2, :] = warna_hitam[:]  # Left
-voxel[team_y_start+1:team_y_start+7, team_x_start+14:team_x_start+15, back_z:back_z+2, :] = warna_hitam[:]  # Right
-voxel[team_y_start:team_y_start+1, team_x_start+12:team_x_start+14, back_z:back_z+2, :] = warna_hitam[:]  # Top
-voxel[team_y_start+3:team_y_start+4, team_x_start+11:team_x_start+15, back_z:back_z+2, :] = warna_hitam[:]  # Middle
+a_start = team_x_start + round(11 * scale)
+a_width = round(4 * scale)
+voxel[team_y_start+letter_stroke:team_y_start+letter_height, a_start:a_start+letter_stroke, back_z:back_z+text_depth, :] = warna_hitam[:]
+voxel[team_y_start+letter_stroke:team_y_start+letter_height, a_start+a_width-letter_stroke:a_start+a_width, back_z:back_z+text_depth, :] = warna_hitam[:]
+voxel[team_y_start:team_y_start+letter_stroke, a_start+letter_stroke:a_start+a_width-letter_stroke, back_z:back_z+text_depth, :] = warna_hitam[:]
+voxel[team_y_start+round(3*scale):team_y_start+round(4*scale), a_start:a_start+a_width, back_z:back_z+text_depth, :] = warna_hitam[:]
 
 # Letter M
-voxel[team_y_start:team_y_start+7, team_x_start+16:team_x_start+17, back_z:back_z+2, :] = warna_hitam[:]  # Left
-voxel[team_y_start:team_y_start+7, team_x_start+20:team_x_start+21, back_z:back_z+2, :] = warna_hitam[:]  # Right
-voxel[team_y_start+1:team_y_start+4, team_x_start+18:team_x_start+19, back_z:back_z+2, :] = warna_hitam[:]  # Middle
+m_start = team_x_start + round(16 * scale)
+m_width = round(5 * scale)
+voxel[team_y_start:team_y_start+letter_height, m_start:m_start+letter_stroke, back_z:back_z+text_depth, :] = warna_hitam[:]
+voxel[team_y_start:team_y_start+letter_height, m_start+m_width-letter_stroke:m_start+m_width, back_z:back_z+text_depth, :] = warna_hitam[:]
+voxel[team_y_start+letter_stroke:team_y_start+round(4*scale), m_start+round(2*scale):m_start+round(3*scale), back_z:back_z+text_depth, :] = warna_hitam[:]
 
-# Number "2" at center of body - much bigger and centered
-num_height = 16
-num_y_start = body_top + round(body_height / 2) - round(num_height / 2)  # Center vertically
-num_width = 14  # Much bigger width
+# Number "2" at center of body - SCALED with resolution
+num_height = round(16 * scale)
+num_width = round(14 * scale)
+num_y_start = body_top + round(body_height / 2) - round(num_height / 2)
 num_x_start = xc - round(num_width / 2)
-stroke_width = 3  # Thicker strokes
+stroke_width = max(2, round(3 * scale))
+mid_section = round(3 * scale)
 
-voxel[num_y_start:num_y_start+stroke_width, num_x_start:num_x_start+num_width, back_z:back_z+2, :] = warna_hitam[:]  # Top
-voxel[num_y_start:num_y_start+7, num_x_start+num_width-stroke_width:num_x_start+num_width, back_z:back_z+2, :] = warna_hitam[:]  # Right top
-voxel[num_y_start+6:num_y_start+9, num_x_start:num_x_start+num_width, back_z:back_z+2, :] = warna_hitam[:]  # Middle
-voxel[num_y_start+8:num_y_start+num_height, num_x_start:num_x_start+stroke_width, back_z:back_z+2, :] = warna_hitam[:]  # Left bottom
-voxel[num_y_start+num_height-stroke_width:num_y_start+num_height, num_x_start:num_x_start+num_width, back_z:back_z+2, :] = warna_hitam[:]  # Bottom
+voxel[num_y_start:num_y_start+stroke_width, num_x_start:num_x_start+num_width, back_z:back_z+text_depth, :] = warna_hitam[:]  # Top
+voxel[num_y_start:num_y_start+round(7*scale), num_x_start+num_width-stroke_width:num_x_start+num_width, back_z:back_z+text_depth, :] = warna_hitam[:]  # Right top
+voxel[num_y_start+round(6*scale):num_y_start+round(9*scale), num_x_start:num_x_start+num_width, back_z:back_z+text_depth, :] = warna_hitam[:]  # Middle
+voxel[num_y_start+round(8*scale):num_y_start+num_height, num_x_start:num_x_start+stroke_width, back_z:back_z+text_depth, :] = warna_hitam[:]  # Left bottom
+voxel[num_y_start+num_height-stroke_width:num_y_start+num_height, num_x_start:num_x_start+num_width, back_z:back_z+text_depth, :] = warna_hitam[:]  # Bottom
 
-# Add small "2" on front right of body
-front_z = body_front  # Position on front of body (at surface)
-small_num_height = 7
-small_num_width = 5
-small_num_y_start = body_top + round(body_height * 0.15)  # Top right area
-small_num_x_start = body_right - small_num_width - 8  # Right side with more margin
-stroke = 1  # Thin stroke
+# Add small "2" on front right of body - SCALED with resolution
+front_z = body_front
+small_num_height = round(7 * scale)
+small_num_width = round(5 * scale)
+small_num_y_start = body_top + round(body_height * 0.15)
+small_num_x_start = body_right - small_num_width - round(8 * scale)
+stroke = max(1, round(1 * scale))
+small_mid = round(3 * scale)
 
-voxel[small_num_y_start:small_num_y_start+stroke, small_num_x_start:small_num_x_start+small_num_width, front_z:front_z+2, :] = warna_hitam[:]  # Top
-voxel[small_num_y_start:small_num_y_start+3, small_num_x_start+small_num_width-stroke:small_num_x_start+small_num_width, front_z:front_z+2, :] = warna_hitam[:]  # Right top
-voxel[small_num_y_start+3:small_num_y_start+4, small_num_x_start:small_num_x_start+small_num_width, front_z:front_z+2, :] = warna_hitam[:]  # Middle
-voxel[small_num_y_start+3:small_num_y_start+small_num_height, small_num_x_start:small_num_x_start+stroke, front_z:front_z+2, :] = warna_hitam[:]  # Left bottom
-voxel[small_num_y_start+small_num_height-stroke:small_num_y_start+small_num_height, small_num_x_start:small_num_x_start+small_num_width, front_z:front_z+2, :] = warna_hitam[:]  # Bottom
+voxel[small_num_y_start:small_num_y_start+stroke, small_num_x_start:small_num_x_start+small_num_width, front_z:front_z+text_depth, :] = warna_hitam[:]  # Top
+voxel[small_num_y_start:small_num_y_start+small_mid, small_num_x_start+small_num_width-stroke:small_num_x_start+small_num_width, front_z:front_z+text_depth, :] = warna_hitam[:]  # Right top
+voxel[small_num_y_start+small_mid:small_num_y_start+small_mid+stroke, small_num_x_start:small_num_x_start+small_num_width, front_z:front_z+text_depth, :] = warna_hitam[:]  # Middle
+voxel[small_num_y_start+small_mid:small_num_y_start+small_num_height, small_num_x_start:small_num_x_start+stroke, front_z:front_z+text_depth, :] = warna_hitam[:]  # Left bottom
+voxel[small_num_y_start+small_num_height-stroke:small_num_y_start+small_num_height, small_num_x_start:small_num_x_start+small_num_width, front_z:front_z+text_depth, :] = warna_hitam[:]  # Bottom
 
 # Add Roblox-style face (2 oval eyes and curved smile)
 # Face positioned at the FRONT of the head
 face_z_start = head_front
-face_z_end = head_front + 3
+face_z_end = head_front + text_depth
 
-# Eyes - simple rectangles (easier to see)
-eye_width = 4
-eye_height = 8
+# Eyes - SCALED (bigger eyes)
+eye_width = max(3, round(6 * scale))
+eye_height = max(5, round(10 * scale))
 eye_spacing = round(head_size * 0.20)
-eye_y_start = head_top + round(head_size * 0.30)
+eye_y_start = head_top + round(head_size * 0.28)
 eye_y_end = eye_y_start + eye_height
 
 # Left eye
@@ -286,17 +301,18 @@ right_eye_x_start = xc + eye_spacing - eye_width//2
 right_eye_x_end = xc + eye_spacing + eye_width//2
 voxel[eye_y_start:eye_y_end, right_eye_x_start:right_eye_x_end, face_z_start:face_z_end, :] = warna_hitam[:]
 
-# Smile - simple curved line
+# Smile - SCALED (shorter width)
 smile_y_start = head_top + round(head_size * 0.65)
-smile_width = round(head_size * 0.40)
-smile_thickness = 3
+smile_width = round(head_size * 0.25)  # Reduced from 0.40 to 0.25
+smile_thickness = max(2, round(3 * scale))
+smile_curve = max(2, round(4 * scale))
 
 # Draw smile as a simple arc
 for j in range(xc - smile_width, xc + smile_width + 1):
     # Parabolic curve for smile
     x_norm = (j - xc) / smile_width
     if abs(x_norm) <= 1:
-        y_offset = int(5 * (1 - x_norm**2))  # Curve upward
+        y_offset = int(smile_curve * (1 - x_norm**2))  # Curve upward
         smile_y = smile_y_start + y_offset
         if smile_y < head_bottom - 2:
             voxel[smile_y:smile_y+smile_thickness, j, face_z_start:face_z_end, :] = warna_hitam[:]
