@@ -5,18 +5,29 @@ from matplotlib import pyplot as plt
 nama_file = "roblox_character"
 threshold = 15
 num_frames = 36
-cam_distance = 350
+
+# Base values for 200 resolution
+BASE_RESOLUTION = 200
+BASE_CAM_DISTANCE = 350
+BASE_FOCAL = 200
 
 # Load model
 print("Loading model...")
 voxel = np.load(nama_file + "_0_0_.npy")
 row, col, length = voxel.shape[0], voxel.shape[1], voxel.shape[2]
 
+# Scale camera parameters based on resolution
+res_scale = row / BASE_RESOLUTION
+cam_distance = round(BASE_CAM_DISTANCE * res_scale)
+focal = round(BASE_FOCAL * res_scale)
+
 player_cx = col // 2
 player_cy = row // 2
 player_cz = length // 2
 
-print(f"Model: {row}x{col}x{length}, Player center: ({player_cx}, {player_cy}, {player_cz})")
+print(f"Model: {row}x{col}x{length} (scale: {res_scale}x)")
+print(f"Camera distance: {cam_distance}, Focal: {focal}")
+print(f"Player center: ({player_cx}, {player_cy}, {player_cz})")
 
 screen = np.zeros(shape=(row, col, 3), dtype=np.uint8)
 
@@ -55,11 +66,10 @@ for frame in range(num_frames):
                     
                     # Render if in front of camera
                     if dz_cam > 50:
-                        focal = 200
-                        scale = focal / dz_cam
+                        proj_scale = focal / dz_cam
                         
-                        sx = int(col/2 - dx_cam * scale)
-                        sy = int(row/2 + dy_cam * scale)  # Plus untuk flip Y
+                        sx = int(col/2 - dx_cam * proj_scale)
+                        sy = int(row/2 + dy_cam * proj_scale)  # Plus untuk flip Y
                         
                         if 0 <= sx < col and 0 <= sy < row:
                             if dz_cam < depth_buffer[sy, sx]:

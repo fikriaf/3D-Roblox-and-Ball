@@ -9,15 +9,15 @@ nama_file = "roblox_kick"
 num_frames = 20
 threshold = 15
 
-# Camera 1: 45° di depan (wajah terlihat), zoom in
-cam1_distance = 250  # Lebih dekat untuk zoom in
-cam1_angle = 45  # 45 derajat dari depan
+# Camera angles (fixed)
+cam1_angle = 45   # 45° di depan (wajah terlihat)
+cam2_angle = 180  # Lurus di belakang (tulisan TEAM 2 terlihat)
 
-# Camera 2: Lurus di belakang (tulisan TEAM 2 terlihat), normal
-cam2_distance = 350  # Normal distance
-cam2_angle = 180  # Lurus di belakang
-
-focal_length = 200
+# Base values for 200 resolution
+BASE_RESOLUTION = 200
+BASE_CAM1_DISTANCE = 250
+BASE_CAM2_DISTANCE = 350
+BASE_FOCAL_LENGTH = 200
 
 #============================================================================================
 #=======================   PROJECTION FUNCTION   ============================================
@@ -78,9 +78,20 @@ def project_with_camera_orbit(voxel, cam_angle_deg, cam_distance, focal):
 #=======================   RENDER ALL FRAMES WITH 2 CAMERAS   ===============================
 #============================================================================================
 
+# Load first frame to get resolution
+first_frame = np.load(f"{nama_file}_frame_000.npy")
+voxel_resolution = first_frame.shape[0]
+res_scale = voxel_resolution / BASE_RESOLUTION
+
+# Scale camera parameters based on resolution
+cam1_distance = round(BASE_CAM1_DISTANCE * res_scale)
+cam2_distance = round(BASE_CAM2_DISTANCE * res_scale)
+focal_length = round(BASE_FOCAL_LENGTH * res_scale)
+
 print("Rendering kick animation with 2 cameras...")
-print(f"Camera 1: {cam1_angle}° (front), distance={cam1_distance} (zoom in)")
-print(f"Camera 2: {cam2_angle}° (back), distance={cam2_distance} (normal)")
+print(f"Voxel resolution: {voxel_resolution} (scale: {res_scale}x)")
+print(f"Camera 1: {cam1_angle}° (front), distance={cam1_distance}, focal={focal_length}")
+print(f"Camera 2: {cam2_angle}° (back), distance={cam2_distance}, focal={focal_length}")
 
 for frame in range(num_frames):
     print(f"Frame {frame+1}/{num_frames}")
